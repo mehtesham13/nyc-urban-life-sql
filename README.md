@@ -1,140 +1,59 @@
-# nyc-data-analysis
-This project is a data-driven exploration of New York City, leveraging NYC Open Data to uncover insights across three key urban facets: public safety, public health, and environmental infrastructure.
+# NYC Urban Life Analysis: Arrests, Restaurant Inspections and Street Trees
 
+Three NYC Open Data datasets, one question: how do public safety, food safety and street trees differ across the five boroughs? The data is loaded into SQLite and queried with SQL (CTEs and window functions), then charted in Python.
 
----
+![Arrests by borough](Arrests%20by%20borough.png)
 
-# NYC Urban Life Analysis: Arrests, Restaurant Inspections, and Street Trees
+## Data
 
-## **Project Overview**
+| Dataset | Contents |
+|---|---|
+| NYPD Arrests | Arrest date, offense, borough, demographics |
+| DOHMH Restaurant Inspections | Inspection date, grade, violations, cuisine, borough |
+| 2015 Street Tree Census | Species, trunk diameter, health, borough |
 
-This project analyzes three NYC Open Data datasets  **NYPD Arrests**, **Restaurant Inspections**, and **Street Tree Census 2015**  to uncover insights about urban life, public services, and environmental quality across boroughs. Using SQL and Python, the project performs data cleaning, aggregation, and visualization to reveal crime trends, restaurant compliance, and tree health patterns.
+All three are on [NYC Open Data](https://opendata.cityofnewyork.us/). The CSVs are too large for this repo, so download them and save them as `NYPD_Arrests.csv`, `Restaurant_Inspection.csv` and `Street_Tree_Census_2015.csv`.
 
----
+## Questions and queries
 
-## **Project Objectives**
+| File | Question |
+|---|---|
+| `query#1.sql` | First look at the arrests table |
+| `query#2.sql` | Which boroughs have more than 50 trees in poor health? |
+| `query#3.sql` | Monthly 2024 arrests for robbery, burglary, assault and grand larceny |
+| `query#4.sql` | Tree counts and trunk size compared with restaurant counts by borough |
+| `query#5.sql` | Arrests by season |
+| `query#6.sql` | Restaurants whose grade changed between inspections (`LAG` window function) |
 
-* **Crime Analysis:** Identify arrest trends and hotspots across NYC boroughs.
-* **Restaurant Compliance:** Evaluate inspection results to determine high-risk areas and common violations.
-* **Environmental Assessment:** Analyze tree distribution and health to understand urban environmental quality.
+Each file holds the SQL as a Python string plus the `pd.read_sql_query` call that runs it.
 
----
+## Charts
 
-## **Datasets Used**
+- Arrests: `Arrests by borough.png`, `Borough Distribution (Bar Plot).png`, `Top 10 Offense Descriptions.png`
+- Restaurants: `Count grades per cuisine.png`, `Number of restaurants by borough and grade.png`, `Top 10 Cuisines by Inspection Count.png`, `Q1 results.png`, `Q2 results.png`
+- Trees: `Tree health by borough.png`, `Tree Health Distribution (Stacked Bar Chart).png`, `Tree Species Diversity (Top 10 Pie Chart).png`
 
-1. **NYPD_Arrests.csv** – Arrests data including offense type, location, and demographics.
-2. **Restaurant_Inspection.csv** – Inspection scores, grades, violations, and restaurant locations.
-3. **Street_Tree_Census_2015.csv** – Tree species, health, and location information.
-
-> All datasets are available from [NYC Open Data](https://opendata.cityofnewyork.us/).
-
----
-
-## **Installation & Requirements**
-
-Python 3.x environment with the following libraries:
+## How to run
 
 ```bash
-pip install pandas sqlite3 matplotlib seaborn
+pip install pandas matplotlib seaborn
 ```
-
----
-
-## **How to Run**
-
-1. Place the CSV files in your project directory.
-2. Open the Jupyter Notebook or Python script.
-3. Load the datasets into an in-memory SQLite database:
 
 ```python
-import pandas as pd
-import os
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-from IPython.display import display, HTML
-%matplotlib inline
 import sqlite3
+import pandas as pd
 
-# Create SQLite in-memory database
-connection = sqlite3.connect(':memory:')
-
-# Load datasets
-pd.read_csv("NYPD_Arrests.csv").to_sql('NYPD_Arrests', connection, if_exists='replace', index=False)
-pd.read_csv("Restaurant_Inspection.csv").to_sql('Restaurant_Inspection', connection, if_exists='replace', index=False)
-pd.read_csv("Street_Tree_Census_2015.csv").to_sql('Street_Tree_Census_2015', connection, if_exists='replace', index=False)
+conn = sqlite3.connect(":memory:")
+pd.read_csv("NYPD_Arrests.csv").to_sql("arrests", conn, index=False)
+pd.read_csv("Restaurant_Inspection.csv").to_sql("restaurants", conn, index=False)
+pd.read_csv("Street_Tree_Census_2015.csv").to_sql("trees", conn, index=False)
 ```
 
-4. Run SQL queries to extract insights.
-5. Visualize results using **matplotlib** or **seaborn**.
+Then paste a query from any `query#*.sql` file and run it with `pd.read_sql_query`.
 
----
+## Next steps
 
-## **Project Structure**
+- Add census demographics and transit data to explain borough differences
+- Forecast restaurant grade drops from past inspection history
 
-```
-nyc-data-analysis/
-├── .gitignore
-├── data_cleaned/
-│   ├── NYPD_Arrests_Clean.csv
-│   ├── Restaurant_Inspection_Clean.csv
-│   └── Street_Tree_Census_2015_Clean.csv
-├── data_raw/
-├── docs/
-├── notebooks/
-│   ├── 01_data_cleaning.ipynb
-│   ├── 02_sql_queries.ipynb
-│   └── 03_visualization.ipynb
-├── reports/
-├── scripts/
-├── sql/
-│   ├── create_tables.sql
-│   ├── query#1.sql
-│   ├── query#2.sql
-│   ├── query#3.sql
-│   ├── query#4.sql
-│   ├── query#5.sql
-│   └── query#6.sql
-├── Visualization/
-│   ├── README.md
-│   ├── NYPD_Arrests/
-│   │   ├── OUTLIER_DETECTION_USING_IQR.ipynb (or .py)
-│   │   ├── Arrests_by_borough.png (or .html)
-│   │   └── Borough_Distribution_Bar_Plot.png (or .html)
-│   ├── Restaurant_Inspection/
-│   │   ├── Count_grades_per_cuisine.png
-│   │   ├── Number_of_restaurants_by_borough_and_grade.png
-│   │   ├── Q1_results.png
-│   │   ├── Q2_results.png
-│   │   └── Top_10_Cuisines_by_Inspection_Count.png
-│   ├── Street_Tree_Census/
-│   │   ├── Tree_health_by_borough.png
-│   │   ├── Tree_Health_Distribution_Stacked_Bar_Chart.png
-│   │   └── Tree_Species_Diversity_Top_10_Pie_Chart.png
-│   └── Top_10_Offense_Descriptions.png
-└── README.md
-```
-
----
-
-## **Challenges & Solutions**
-
-* **Data Quality Issues:** Missing or inconsistent values handled by cleaning, standardization, and imputation.
-* **Large Dataset Size:** Queries optimized with CTEs and in-memory SQLite to improve performance.
-* **Dataset Integration:** Standardized borough and location fields before joining datasets.
-
----
-
-## **Future Steps**
-
-* Integrate additional NYC datasets (crime trends, transportation, demographics) for deeper insights.
-* Build automated pipelines and dashboards for real-time monitoring.
-* Apply predictive modeling to forecast crime hotspots, restaurant violations, or areas of poor tree health.
-
----
-
-## **Author**
-
-Your Name – Muhammad Ehtesham
-
-
+Author: Muhammad Ehtesham · [LinkedIn](https://www.linkedin.com/in/muhammad-ehtesham-dsa)
