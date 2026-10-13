@@ -2,7 +2,7 @@
 
 Three NYC Open Data datasets, one question: how do public safety, food safety and street trees differ across the five boroughs? The data is loaded into SQLite and queried with SQL (CTEs and window functions), then charted in Python.
 
-![Arrests by borough](Arrests%20by%20borough.png)
+![Arrests by borough](images/arrests_by_borough.png)
 
 ## Data
 
@@ -18,20 +18,22 @@ All three are on [NYC Open Data](https://opendata.cityofnewyork.us/). The CSVs a
 
 | File | Question |
 |---|---|
-| `query#1.sql` | First look at the arrests table |
-| `query#2.sql` | Which boroughs have more than 50 trees in poor health? |
-| `query#3.sql` | Monthly 2024 arrests for robbery, burglary, assault and grand larceny |
-| `query#4.sql` | Tree counts and trunk size compared with restaurant counts by borough |
-| `query#5.sql` | Arrests by season |
-| `query#6.sql` | Restaurants whose grade changed between inspections (`LAG` window function) |
+| `queries/q1_first_look_arrests.sql` | First look at the arrests table |
+| `queries/q2_unhealthy_trees_by_borough.sql` | Which boroughs have more than 50 trees in poor health? |
+| `queries/q3_monthly_arrests_by_crime_type.sql` | Monthly 2024 arrests for robbery, burglary, assault and grand larceny |
+| `queries/q4_trees_vs_restaurants_by_borough.sql` | Tree counts and trunk size compared with restaurant counts by borough |
+| `queries/q5_arrests_by_season.sql` | Arrests by season |
+| `queries/q6_restaurant_grade_changes.sql` | Restaurants whose grade changed between inspections (`LAG` window function) |
 
 Each file holds the SQL as a Python string plus the `pd.read_sql_query` call that runs it.
 
-## Charts
+## Charts (`images/`)
 
-- Arrests: `Arrests by borough.png`, `Borough Distribution (Bar Plot).png`, `Top 10 Offense Descriptions.png`
-- Restaurants: `Count grades per cuisine.png`, `Number of restaurants by borough and grade.png`, `Top 10 Cuisines by Inspection Count.png`, `Q1 results.png`, `Q2 results.png`
-- Trees: `Tree health by borough.png`, `Tree Health Distribution (Stacked Bar Chart).png`, `Tree Species Diversity (Top 10 Pie Chart).png`
+- Arrests: `arrests_by_borough`, `borough_distribution_bar_plot`, `top_10_offense_descriptions`
+- Restaurants: `count_grades_per_cuisine`, `number_of_restaurants_by_borough_and_grade`, `top_10_cuisines_by_inspection_count`, `q1_results`, `q2_results`
+- Trees: `tree_health_by_borough`, `tree_health_distribution_stacked_bar_chart`, `tree_species_diversity_top_10_pie_chart`
+
+![Tree health by borough](images/tree_health_by_borough.png)
 
 ## How to run
 
@@ -49,7 +51,7 @@ pd.read_csv("Restaurant_Inspection.csv").to_sql("restaurants", conn, index=False
 pd.read_csv("Street_Tree_Census_2015.csv").to_sql("trees", conn, index=False)
 ```
 
-Then paste a query from any `query#*.sql` file and run it with `pd.read_sql_query`.
+Then paste a query from any file in `queries/` and run it with `pd.read_sql_query`.
 
 ## Next steps
 
